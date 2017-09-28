@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
+import util.TestObjectFactory;
 
 /**
  * Unit tests for SeatHold class.
@@ -20,48 +20,33 @@ import com.google.common.collect.ImmutableList;
  */
 public class SeatHoldTests {
 
-	private static final String TEST_EMAIL = "test@email.com";
-
-	private static final List<Seat> DEFAULT_SEATS;
-
-	static {
-		Seat seat1 = new Seat(1, 1, 1, 1.0);
-		Seat seat2 = new Seat(2, 2, 2, 2.0);
-		Seat seat3 = new Seat(3, 3, 3, 3.0);
-		Seat seat4 = new Seat(4, 4, 4, 4.0);
-
-		DEFAULT_SEATS = ImmutableList.of(seat1, seat2, seat3, seat4);
-	}
-
-	private static final SeatHold TEST_SEAT_HOLD = new SeatHold(1, TEST_EMAIL, DEFAULT_SEATS);
-
 	@Test
 	public void testGetId() {
-		assertEquals(1, TEST_SEAT_HOLD.getId());
+		assertEquals(1, TestObjectFactory.newSeatHold().getId());
 	}
 
 	@Test
 	public void testGetCustomerEmail() {
-		assertEquals(TEST_EMAIL, TEST_SEAT_HOLD.getCustomerEmail());
+		assertEquals(TestObjectFactory.TEST_EMAIL, TestObjectFactory.newSeatHold().getCustomerEmail());
 	}
 
 	@Test
 	public void testGetNumberOfSeats() {
-		assertEquals(4, TEST_SEAT_HOLD.getNumberOfSeats());
+		assertEquals(4, TestObjectFactory.newSeatHold().getNumberOfSeats());
 	}
 
 	@Test
 	public void testSumNumberOfSeats() {
-		SeatHold seatHold1 = new SeatHold(1, TEST_EMAIL, DEFAULT_SEATS);
-		SeatHold seatHold2 = new SeatHold(1, TEST_EMAIL, DEFAULT_SEATS);
-		SeatHold seatHold3 = new SeatHold(1, TEST_EMAIL, DEFAULT_SEATS);
+		SeatHold seatHold1 = new SeatHold(1, TestObjectFactory.TEST_EMAIL, TestObjectFactory.TEST_SEATS);
+		SeatHold seatHold2 = new SeatHold(1, TestObjectFactory.TEST_EMAIL, TestObjectFactory.TEST_SEATS);
+		SeatHold seatHold3 = new SeatHold(1, TestObjectFactory.TEST_EMAIL, TestObjectFactory.TEST_SEATS);
 
 		List<SeatHold> seatHolds = new ArrayList<>();
 		seatHolds.add(seatHold1);
 		seatHolds.add(seatHold2);
 		seatHolds.add(seatHold3);
 
-		assertEquals(12, SeatHold.sumNumberOfSeats(seatHolds));
+		assertEquals(TestObjectFactory.TEST_SEATS.size() * 3, SeatHold.sumNumberOfSeats(seatHolds));
 	}
 
 	@Test
@@ -72,32 +57,32 @@ public class SeatHoldTests {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void negativeIdShouldThrowIllegalArgument() {
-		new SeatHold(-1, TEST_EMAIL, DEFAULT_SEATS);
+		new SeatHold(-1, TestObjectFactory.TEST_EMAIL, TestObjectFactory.TEST_SEATS);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void zeroIdShouldThrowIllegalArgument() {
-		new SeatHold(0, TEST_EMAIL, DEFAULT_SEATS);
+		new SeatHold(0, TestObjectFactory.TEST_EMAIL, TestObjectFactory.TEST_SEATS);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void emptySeatsShouldThrowIllegalArgument() {
-		new SeatHold(1, TEST_EMAIL, Collections.emptyList());
+		new SeatHold(1, TestObjectFactory.TEST_EMAIL, Collections.emptyList());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void nullSeatsShouldThrowIllegalArgument() {
-		new SeatHold(1, TEST_EMAIL, null);
+		new SeatHold(1, TestObjectFactory.TEST_EMAIL, null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void emptyEmailShouldThrowIllegalArgument() {
-		new SeatHold(1, "", DEFAULT_SEATS);
+		new SeatHold(1, "", TestObjectFactory.TEST_SEATS);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void nullEmailShouldThrowIllegalArgument() {
-		new SeatHold(1, null, DEFAULT_SEATS);
+		new SeatHold(1, null, TestObjectFactory.TEST_SEATS);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -108,12 +93,12 @@ public class SeatHoldTests {
 		seats.add(seat1);
 		seats.add(seat2);
 
-		new SeatHold(1, TEST_EMAIL, seats);
+		new SeatHold(1, TestObjectFactory.TEST_EMAIL, seats);
 	}
 
 	@Test
 	public void validConstruction() {
-		SeatHold hold = new SeatHold(1, TEST_EMAIL, DEFAULT_SEATS);
+		SeatHold hold = new SeatHold(1, TestObjectFactory.TEST_EMAIL, TestObjectFactory.TEST_SEATS);
 		assertNotNull(hold);
 	}
 
