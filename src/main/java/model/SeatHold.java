@@ -1,13 +1,13 @@
 package model;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import com.google.common.base.Preconditions;
 
 /**
- * SeatHold. A temporary reservation on a number of seats for a given venue and
- * level. Note that you can not have one SeatHold that contains seats in
- * multiple levels.
+ * SeatHold. A reservation on a selection of seats.
  * 
  * @author bstoll
  *
@@ -16,26 +16,30 @@ public final class SeatHold {
 
 	private final int id;
 	private final String customerEmail;
-	private final int numberOfSeats;
-	private final int venueId;
-	private final int levelId;
+	private final List<Seat> seats;
 
-	public SeatHold(int id, String customerEmail, int numberOfSeats, int venueId, int levelId) {
+	/**
+	 * Sets up a SeatHold.
+	 * 
+	 * @param id
+	 *            The int id of the SeatHold. Must be greater than 0.
+	 * @param customerEmail
+	 *            The Customer email. Must not be null or empty.
+	 * @param seats
+	 *            The Seats. Must be greater than 0.
+	 */
+	public SeatHold(int id, String customerEmail, List<Seat> seats) {
 
 		Preconditions.checkArgument(id > 0, "Invalid seathold id. Must be greater than 0");
 		Preconditions.checkArgument(customerEmail != null, "Invalid Customer email. Must not be null");
 		Preconditions.checkArgument(!customerEmail.isEmpty(), "Invalid Customer email. Must not be empty string");
-		Preconditions.checkArgument(numberOfSeats > 0, "Invalid number of seats. Must be greater than 0");
-		Preconditions.checkArgument(venueId > 0, "Invalid venue ID, Must be greater than 0");
-		Preconditions.checkArgument(numberOfSeats > 0, "Invalid level ID, Must be greater than 0");
+		Preconditions.checkArgument(seats != null, "Invalid seats. Must not be null");
+		Preconditions.checkArgument(!seats.isEmpty(), "Invalid seats. Must not be empty");
+		seats.forEach(Preconditions::checkNotNull);
 
 		this.id = id;
-
-		// FIXME Prob need to check customer email for valid email.
 		this.customerEmail = customerEmail;
-		this.numberOfSeats = numberOfSeats;
-		this.venueId = venueId;
-		this.levelId = levelId;
+		this.seats = seats;
 	}
 
 	/**
@@ -53,30 +57,44 @@ public final class SeatHold {
 	}
 
 	/**
+	 * @return the seats
+	 */
+	public List<Seat> getSeats() {
+		return Collections.unmodifiableList(seats);
+	}
+
+	/**
 	 * @return the numberOfSeats
 	 */
 	public int getNumberOfSeats() {
-		return numberOfSeats;
+		return seats.size();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "SeatHold [id=" + id + ", customerEmail=" + customerEmail + ", numberSeats=" + seats.size()
+				+ ", numberSeats=" + seats + "]";
 	}
 
 	/**
-	 * @return the venueId
+	 * Sums the number of seats in a collection of SeatHolds.
+	 * 
+	 * @param seatHolds
+	 *            Collection of SeatHolds. If null then 0 will be returned.
+	 * @return sum of all seats in a collection of seat holds.
 	 */
-	public int getVenueId() {
-		return venueId;
-	}
-
-	/**
-	 * @return the levelId
-	 */
-	public int getLevelId() {
-		return levelId;
-	}
-
-	public static int sum(Collection<SeatHold> seatHolds) {
+	public static int sumNumberOfSeats(Collection<SeatHold> seatHolds) {
 		int sum = 0;
-		for (SeatHold seatHold : seatHolds) {
-			sum += seatHold.getNumberOfSeats();
+
+		if (seatHolds != null) {
+			for (SeatHold seatHold : seatHolds) {
+				sum += seatHold.getNumberOfSeats();
+			}
 		}
 
 		return sum;

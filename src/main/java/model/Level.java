@@ -1,9 +1,14 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.google.common.base.Preconditions;
 
 /**
- * Level represents a section of seats inside of a venue.
+ * Level represents a section of seats inside of a venue. They are identified by
+ * id and name.
  * 
  * 
  * @author bstoll
@@ -11,12 +16,11 @@ import com.google.common.base.Preconditions;
  */
 public final class Level {
 
-	private final String name;
-	// FIXME Should not use double here.
-	private final double pricePerTicket;
+	private final int id;
 
-	private final int numberOfRows;
-	private final int seatsInRow;
+	private final String name;
+
+	private final List<Seat> seats;
 
 	/**
 	 * 
@@ -25,55 +29,56 @@ public final class Level {
 	 * @param pricePerTicket
 	 *            The Price of a ticket at this level. Must be greater than 0.
 	 * @param numberOfRows
-	 *            The number of rows in this section. Must be greater than 0.
+	 *            The number of rows in this level. Must be greater than 0.
 	 * @param seatsInRow
 	 *            The number of seats in a row. Must be greater than 0.
 	 */
-	public Level(String name, double pricePerTicket, int numberOfRows, int seatsInRow) {
+	public Level(int id, String name, double pricePerTicket, int numberOfRows, int seatsInRow) {
+		Preconditions.checkArgument(id > 0, "Invalid level, Must be greater than 0");
+		Preconditions.checkArgument(numberOfRows > 0, "Invalid Number Of Rows, Must be greater than 0");
 		Preconditions.checkArgument(name != null && !name.isEmpty(), "Invalid Name, Must not be null or empty");
 		Preconditions.checkArgument(pricePerTicket > 0.00, "Invalid Price, Must be greater than 0");
 		Preconditions.checkArgument(numberOfRows > 0, "Invalid Number Of Rows, Must be greater than 0");
 		Preconditions.checkArgument(seatsInRow > 0, "Invalid Seats in Row, Must be greater than 0");
 
+		this.id = id;
 		this.name = name;
-		this.pricePerTicket = pricePerTicket;
-		this.numberOfRows = numberOfRows;
-		this.seatsInRow = seatsInRow;
+		this.seats = new ArrayList<>();
+
+		for (int row = 1; row <= numberOfRows; row++) {
+			for (int seat = 1; seat <= seatsInRow; seat++) {
+				seats.add(new Seat(id, row, seat, pricePerTicket));
+			}
+		}
+
 	}
 
 	/**
-	 * @return the name
+	 * @return the id of the Level.
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @return the name of the Level.
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @return the pricePerTicket
+	 * @return Unmodifiable list of Seats.
 	 */
-	public double getPricePerTicket() {
-		return pricePerTicket;
+	public List<Seat> getSeats() {
+		return Collections.unmodifiableList(seats);
 	}
 
 	/**
-	 * @return the numberOfRows
-	 */
-	public int getNumberOfRows() {
-		return numberOfRows;
-	}
-
-	/**
-	 * @return the seatsInRow
-	 */
-	public int getSeatsInRow() {
-		return seatsInRow;
-	}
-
-	/**
-	 * @return the total number of seats.
+	 * @return the total number of seats on this level.
 	 */
 	public int getTotalNumberOfSeats() {
-		return numberOfRows * seatsInRow;
+		return seats.size();
 	}
 
 }
