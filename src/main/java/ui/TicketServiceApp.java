@@ -23,7 +23,7 @@ public class TicketServiceApp extends Application {
 		Stage stage = new Stage();
 		stage.setScene(scene);
 		stage.setHeight(1000);
-		stage.setWidth(1000);
+		stage.setWidth(1200);
 		stage.setTitle("Ticket Service Application");
 
 		stage.show();

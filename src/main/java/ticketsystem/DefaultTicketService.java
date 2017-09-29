@@ -67,7 +67,7 @@ public class DefaultTicketService implements TicketService {
 	 *             if any of the constraints are invalidated.
 	 */
 	public DefaultTicketService(TicketReserver ticketReserver, long expirationTime, TimeUnit expirationUnits) {
-		this(ticketReserver, 2, TimeUnit.MINUTES, null);
+		this(ticketReserver, expirationTime, expirationUnits, null);
 
 	}
 

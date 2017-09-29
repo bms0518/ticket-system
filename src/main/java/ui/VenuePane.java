@@ -8,23 +8,33 @@ import java.util.UUID;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import model.Level;
 import model.Seat;
 import model.Venue;
 
+/**
+ * Pane representing a Venue. This will set up all of the Seats in the Venue in
+ * the UI.
+ * 
+ * @author bstoll
+ *
+ */
 public class VenuePane extends Pane {
 
 	private static final int ROW_GAP = 10;
 
-	private static final int LEVEL_GAP = 50;
+	private static final int LEVEL_GAP = 20;
+
+	private static final int TEXT_GAP = 20;
 
 	private static final int SEAT_GAP = 2;
 
-	private static final int SEAT_HEIGHT = 5;
+	private static final int SEAT_HEIGHT = 8;
 
-	private static final int SEAT_WIDTH = 5;
+	private static final int SEAT_WIDTH = 8;
 
 	private static final Color[] COLORS = new Color[] { Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW };
 
@@ -35,7 +45,16 @@ public class VenuePane extends Pane {
 		int y = 0;
 
 		int i = 0;
+
+		y += TEXT_GAP;
 		for (Level level : venue.getLevels()) {
+
+			Label label = new Label(level.getName());
+			label.setLayoutX(0);
+			label.setLayoutY(y);
+			super.getChildren().add(label);
+
+			y += TEXT_GAP;
 			int currentY = handleLevel(level, COLORS[i], y);
 			y = currentY;
 			y += LEVEL_GAP;

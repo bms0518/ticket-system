@@ -5,29 +5,47 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+/**
+ * SeatView. A representation of a Seat in the UI.
+ * 
+ * @author bstoll
+ *
+ */
 public class SeatView extends Rectangle {
 
-	private final BooleanProperty isHeld = new SimpleBooleanProperty();
+	private final BooleanProperty held = new SimpleBooleanProperty();
 
-	private final BooleanProperty isReserved = new SimpleBooleanProperty();
+	private final BooleanProperty reserved = new SimpleBooleanProperty();
 
 	private static final Color DEFAULT_FILL = Color.WHITE;
 	private static final Color DEFAULT_STROKE = Color.BLACK;
 
+	/**
+	 * Sets up SeatView.
+	 * 
+	 * @param x
+	 *            X location of the SeatView.
+	 * @param y
+	 *            Y location of the SeatView.
+	 * @param width
+	 *            Width of the SeatView.
+	 * @param height
+	 *            Height of the SeatView
+	 */
 	public SeatView(double x, double y, double width, double height) {
 		super(x, y, width, height);
 		setFill(DEFAULT_FILL);
 		setStroke(DEFAULT_STROKE);
 
-		isHeld.addListener((obs, oldVal, newVal) -> {
+		held.addListener((obs, oldVal, newVal) -> {
 			if (newVal) {
-				setFill(Color.ORANGE);
+				setFill(Color.YELLOW);
 			} else {
 				setFill(DEFAULT_FILL);
 			}
 		});
 
-		isReserved.addListener((obs, oldVal, newVal) -> {
+		reserved.addListener((obs, oldVal, newVal) -> {
 			if (newVal) {
 				setStroke(Color.RED);
 			} else {
@@ -37,17 +55,40 @@ public class SeatView extends Rectangle {
 
 	}
 
+	/**
+	 * @return true if held, false otherwise.
+	 */
+	public boolean isHeld() {
+		return held.get();
+	}
+
+	/**
+	 * @return true if reserved, false otherwise.
+	 */
+	public boolean getIsReserved() {
+		return reserved.get();
+	}
+
+	/**
+	 * Sets hold to true.
+	 */
 	public void hold() {
-		isHeld.set(true);
+		held.set(true);
 	}
 
+	/**
+	 * Sets reserved to true.
+	 */
 	public void reserve() {
-		isReserved.set(true);
+		reserved.set(true);
 	}
 
+	/**
+	 * Sets held and reserved to false.
+	 */
 	public void clear() {
-		isHeld.set(false);
-		isReserved.set(false);
+		held.set(false);
+		reserved.set(false);
 	}
 
 }

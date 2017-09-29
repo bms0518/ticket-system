@@ -2,11 +2,16 @@
 
 Ticket System is a basic ticket reservation service that allows users to hold,reserve, and view the total number of seats available.
 
-## 
+## Unit Tests
+
+- There is currently 120 unit tests.
+- The model package is at 98.7% code coverage.
+- The ticketsystem package is at 97.7% code coverage.
+- The ui did not make sense to unit test so it was left out of the unit tests.
 
 ## Build, Test, Run
 
-Ticket system is built using Gradle. The gradle wrapper is used in this project and is all that is needed to build, test, and run the system. This can be run on Windows and Linux.
+Ticket system is built using Gradle. The gradle wrapper is used in this project and is all that is needed to build, test, and run the system. This can be run on Windows and Linux. Download/Clone the project to local machine. Open up a command-window/terminal in the root of the project and run these commands.
 
 
 ### Building the project
@@ -37,6 +42,6 @@ The Simulator is a simple UI that shows multiple requests being made to the serv
 
 ## Room for Improvement/Extension
 
--Currently the holds and reservations are only stored in memory. Right now SeatState is the only thing that stores the reservations and holds. Exporting this to a DB would be pretty straight forward. 
--The UI could be greatly improved by showing the actual seat layout of a venue, showing seat numbers and rows on the UI, showing total number of seats left per row.
+- Currently the holds and reservations are only stored in memory. Right now SeatState is the only thing that stores the reservations and holds. Exporting this to a DB would be pretty straight forward. 
+- The UI could be greatly improved by showing the actual seat layout of a venue, showing seat numbers and rows on the UI, showing total number of seats left per row.
 
