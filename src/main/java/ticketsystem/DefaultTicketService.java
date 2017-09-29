@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,8 @@ public class DefaultTicketService implements TicketService {
 
 	private final TimeUnit expirationUnits;
 
+	private final Consumer<SeatHold> expirationListener;
+
 	/**
 	 * Sets up Default Ticket Service. This will use default expiration time of 2
 	 * minutes.
@@ -64,12 +67,35 @@ public class DefaultTicketService implements TicketService {
 	 *             if any of the constraints are invalidated.
 	 */
 	public DefaultTicketService(TicketReserver ticketReserver, long expirationTime, TimeUnit expirationUnits) {
+		this(ticketReserver, 2, TimeUnit.MINUTES, null);
+
+	}
+
+	/**
+	 * Sets up Default Ticket Service.
+	 * 
+	 * @param ticketReserver
+	 *            The TicketReserver. Must not be null.
+	 * @param expirationTime
+	 *            The time it takes to expire. This is in combination with TimeUnit.
+	 *            Must be greater than 0.
+	 * @param expirationUnits
+	 *            The TimeUnit for expiration. Must not be null.
+	 * @param expirationListener
+	 *            Listener for Expiring SeatHolds.
+	 * @throws IllegalArgumentException
+	 *             if any of the constraints are invalidated.
+	 */
+	public DefaultTicketService(TicketReserver ticketReserver, long expirationTime, TimeUnit expirationUnits,
+			Consumer<SeatHold> expirationListener) {
 		Preconditions.checkArgument(ticketReserver != null, "Invalid ticketReserver. Must not be null");
 		Preconditions.checkArgument(expirationTime > 0, "Invalid expirationTime. Must be greater than 0");
 		Preconditions.checkArgument(expirationUnits != null, "Invalid TimeUnit for Expiration. Must not be null");
 		this.expirationTime = expirationTime;
 		this.expirationUnits = expirationUnits;
 		this.ticketReserver = ticketReserver;
+		this.expirationListener = expirationListener;
+
 	}
 
 	@Override
@@ -156,6 +182,9 @@ public class DefaultTicketService implements TicketService {
 		@Override
 		public void run() {
 			synchronized (ticketReserver) {
+				if (expirationListener != null) {
+					expirationListener.accept(seatHold);
+				}
 				ticketReserver.expireSeatHold(seatHold);
 			}
 		}

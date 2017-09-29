@@ -57,8 +57,10 @@ public final class Level {
 		this.seats = new ArrayList<>();
 
 		for (int row = 1; row <= numberOfRows; row++) {
-			for (int seat = 1; seat <= seatsInRow; seat++) {
-				seats.add(new Seat(id, row, seat, pricePerTicket));
+			for (int seatNumber = 1; seatNumber <= seatsInRow; seatNumber++) {
+				Seat seat = new Seat(id, row, seatNumber, pricePerTicket);
+				seats.add(seat);
+
 			}
 		}
 

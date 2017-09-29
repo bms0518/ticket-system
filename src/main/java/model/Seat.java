@@ -1,5 +1,7 @@
 package model;
 
+import java.util.UUID;
+
 import javax.money.MonetaryAmount;
 
 import com.google.common.base.Preconditions;
@@ -13,6 +15,7 @@ import com.google.common.base.Preconditions;
  */
 public final class Seat implements Comparable<Seat> {
 
+	private final UUID uniqueSeatId = UUID.randomUUID();
 	private final int levelId;
 	private final int row;
 	private final int seatNumber;
@@ -70,6 +73,13 @@ public final class Seat implements Comparable<Seat> {
 	 */
 	public MonetaryAmount getPricePerTicket() {
 		return pricePerTicket;
+	}
+
+	/**
+	 * @return the uniqueSeatId
+	 */
+	public UUID getUniqueSeatId() {
+		return uniqueSeatId;
 	}
 
 	@Override
