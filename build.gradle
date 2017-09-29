@@ -24,7 +24,7 @@ dependencies {
     
 }
 
-task runSimluator(type: JavaExec) {
+task runSimulator(type: JavaExec) {
   classpath sourceSets.main.runtimeClasspath
   main = "ui.TicketServiceApp"
 }
