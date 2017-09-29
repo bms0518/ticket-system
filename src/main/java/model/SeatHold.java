@@ -1,13 +1,13 @@
 package model;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
 
 /**
- * SeatHold. A reservation on a selection of seats.
+ * SeatHold represents a specific hold on selected number of seats. They are
+ * tied directly to a users email. This object is Immutable.
  * 
  * @author bstoll
  *
@@ -26,7 +26,12 @@ public final class SeatHold {
 	 * @param customerEmail
 	 *            The Customer email. Must not be null or empty.
 	 * @param seats
-	 *            The Seats. Must be greater than 0.
+	 *            The Seats. Must not be null or empty. Each Seat in the List must
+	 *            not be null.
+	 * @throws IllegalArgumentException
+	 *             If any of the constraints are invalidated.
+	 * @throws NullPointerException
+	 *             If any of the Seats in the List are null.
 	 */
 	public SeatHold(int id, String customerEmail, List<Seat> seats) {
 
@@ -57,7 +62,7 @@ public final class SeatHold {
 	}
 
 	/**
-	 * @return the seats
+	 * @return UnmodifiableCollection of the seats
 	 */
 	public List<Seat> getSeats() {
 		return Collections.unmodifiableList(seats);
@@ -79,26 +84,6 @@ public final class SeatHold {
 	public String toString() {
 		return "SeatHold [id=" + id + ", customerEmail=" + customerEmail + ", numberSeats=" + seats.size()
 				+ ", numberSeats=" + seats + "]";
-	}
-
-	/**
-	 * Sums the number of seats in a collection of SeatHolds.
-	 * 
-	 * @param seatHolds
-	 *            Collection of SeatHolds. If null then 0 will be returned.
-	 * @return sum of all seats in a collection of seat holds.
-	 */
-	public static int sumNumberOfSeats(Collection<SeatHold> seatHolds) {
-		int sum = 0;
-
-		if (seatHolds != null) {
-			for (SeatHold seatHold : seatHolds) {
-				sum += seatHold.getNumberOfSeats();
-			}
-		}
-
-		return sum;
-
 	}
 
 }

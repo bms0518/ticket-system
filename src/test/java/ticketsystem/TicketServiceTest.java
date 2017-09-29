@@ -1,8 +1,11 @@
 package ticketsystem;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -28,6 +31,21 @@ public class TicketServiceTest {
 		new DefaultTicketService(null);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void negativeExpirationTimeOnConstruction() {
+		new DefaultTicketService(TestObjectFactory.newReserver(), -1, TimeUnit.SECONDS);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void zeroExpirationTimeOnConstruction() {
+		new DefaultTicketService(TestObjectFactory.newReserver(), 0, TimeUnit.SECONDS);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void nullExpirationUnitOnConstruction() {
+		new DefaultTicketService(TestObjectFactory.newReserver(), 1, null);
+	}
+
 	@Test
 	public void testNumSeatsAvailable() {
 		TicketService ticketService = TestObjectFactory.newService();
@@ -48,75 +66,71 @@ public class TicketServiceTest {
 		ticketService.reserveSeats(seatHold.getId(), seatHold.getCustomerEmail());
 	}
 
-	// public static void main(String[] args) throws InterruptedException {
-	//
-	// TicketReserver ticketReserver = new TicketReserver(VENUE);
-	// TicketService ticketSystem = new DefaultTicketService(ticketReserver);
-	//
-	// Thread t1 = new Thread(() -> {
-	// SeatHold seatHold = ticketSystem.findAndHoldSeats(500, Optional.of(1),
-	// Optional.of(4),
-	// TestObjectFactory.TEST_EMAIL);
-	// System.err.println(seatHold);
-	//
-	// });
-	//
-	// Thread t2 = new Thread(() -> {
-	// SeatHold seatHold = ticketSystem.findAndHoldSeats(500, Optional.of(1),
-	// Optional.of(4),
-	// TestObjectFactory.TEST_EMAIL);
-	// System.err.println(seatHold);
-	// });
-	//
-	// Thread t3 = new Thread(() -> {
-	// SeatHold seatHold = ticketSystem.findAndHoldSeats(500, Optional.of(1),
-	// Optional.of(4),
-	// TestObjectFactory.TEST_EMAIL);
-	// System.err.println(seatHold);
-	// });
-	//
-	// Thread t4 = new Thread(() -> {
-	// SeatHold seatHold = ticketSystem.findAndHoldSeats(500, Optional.of(1),
-	// Optional.of(4),
-	// TestObjectFactory.TEST_EMAIL);
-	// System.err.println(seatHold);
-	// });
-	//
-	// Thread t5 = new Thread(() -> {
-	// SeatHold seatHold = ticketSystem.findAndHoldSeats(500, Optional.of(1),
-	// Optional.of(4),
-	// TestObjectFactory.TEST_EMAIL);
-	// System.err.println(seatHold);
-	// });
-	//
-	// Thread t6 = new Thread(() -> {
-	// SeatHold seatHold = ticketSystem.findAndHoldSeats(500, Optional.of(1),
-	// Optional.of(4),
-	// TestObjectFactory.TEST_EMAIL);
-	// System.err.println(seatHold);
-	// });
-	//
-	// Thread t7 = new Thread(() -> {
-	// SeatHold seatHold = ticketSystem.findAndHoldSeats(500, Optional.of(1),
-	// Optional.of(4),
-	// TestObjectFactory.TEST_EMAIL);
-	// System.err.println(seatHold);
-	// });
-	//
-	// t1.start();
-	// Thread.sleep(10005);
-	// t2.start();
-	// Thread.sleep(10005);
-	// t3.start();
-	// Thread.sleep(10005);
-	// t4.start();
-	// Thread.sleep(10005);
-	// t5.start();
-	// Thread.sleep(10005);
-	// t6.start();
-	// Thread.sleep(10005);
-	// t7.start();
-	//
-	// }
+	@Test(expected = IllegalArgumentException.class)
+	public void negativeIdOnReserveShouldThrowIllegalArgument() {
+		TicketService ticketService = TestObjectFactory.newService();
+		SeatHold seatHold = ticketService.findAndHoldSeats(1, Optional.empty(), Optional.empty(),
+				TestObjectFactory.TEST_EMAIL);
+		ticketService.reserveSeats(-1, seatHold.getCustomerEmail());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void zeroIdOnReserveShouldThrowIllegalArgument() {
+		TicketService ticketService = TestObjectFactory.newService();
+		SeatHold seatHold = ticketService.findAndHoldSeats(1, Optional.empty(), Optional.empty(),
+				TestObjectFactory.TEST_EMAIL);
+		ticketService.reserveSeats(0, seatHold.getCustomerEmail());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void nullEmailOnReserveShouldThrowIllegalArgument() {
+		TicketService ticketService = TestObjectFactory.newService();
+		SeatHold seatHold = ticketService.findAndHoldSeats(1, Optional.empty(), Optional.empty(),
+				TestObjectFactory.TEST_EMAIL);
+		ticketService.reserveSeats(seatHold.getId(), null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void emptyEmailOnReserveShouldThrowIllegalArgument() {
+		TicketService ticketService = TestObjectFactory.newService();
+		SeatHold seatHold = ticketService.findAndHoldSeats(1, Optional.empty(), Optional.empty(),
+				TestObjectFactory.TEST_EMAIL);
+		ticketService.reserveSeats(seatHold.getId(), "");
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void badEmailOnReserveShouldThrowIllegalArgument() {
+		TicketService ticketService = TestObjectFactory.newService();
+		SeatHold seatHold = ticketService.findAndHoldSeats(1, Optional.empty(), Optional.empty(),
+				TestObjectFactory.TEST_EMAIL);
+		ticketService.reserveSeats(seatHold.getId(), "fake@email.com");
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void noHoldsBeforeReserveShouldThrowIllegalState() {
+		TicketService ticketService = TestObjectFactory.newService();
+		ticketService.reserveSeats(1, TestObjectFactory.TEST_EMAIL);
+	}
+
+	@Test
+	public void testReserveTooManySeats() throws InterruptedException {
+		TicketService ticketService = new DefaultTicketService(TestObjectFactory.newReserver(), 5, TimeUnit.SECONDS);
+		SeatHold seatHold = ticketService.findAndHoldSeats(TestObjectFactory.TOTAL_SEATS_IN_VENUE + 1, Optional.empty(),
+				Optional.empty(), TestObjectFactory.TEST_EMAIL);
+
+		assertNull(seatHold);
+	}
+
+	@Test
+	public void testExpiration() throws InterruptedException {
+		TicketService ticketService = new DefaultTicketService(TestObjectFactory.newReserver(), 2, TimeUnit.SECONDS);
+		ticketService.findAndHoldSeats(1, Optional.empty(), Optional.empty(), TestObjectFactory.TEST_EMAIL);
+		assertEquals(TestObjectFactory.TOTAL_SEATS_IN_VENUE - 1, ticketService.numSeatsAvailable(Optional.empty()));
+
+		Thread.sleep(3000);
+
+		assertEquals(TestObjectFactory.TOTAL_SEATS_IN_VENUE, ticketService.numSeatsAvailable(Optional.empty()));
+
+	}
 
 }

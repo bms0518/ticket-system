@@ -1,22 +1,22 @@
 package model;
 
+import javax.money.MonetaryAmount;
+
 import com.google.common.base.Preconditions;
 
 /**
  * Represents a Unique Seat in a Venue. Identified by Level ID, Row, and Seat
- * number. This is meant to be an immutable representation of the a specific
- * seat.
+ * number. This is an immutable representation of a specific seat.
  * 
  * @author bstoll
  *
  */
-public class Seat implements Comparable<Seat> {
+public final class Seat implements Comparable<Seat> {
 
 	private final int levelId;
 	private final int row;
 	private final int seatNumber;
-	// FIXME Should not use double here.
-	private final double pricePerTicket;
+	private final MonetaryAmount pricePerTicket;
 
 	/**
 	 * Sets up a Seat.
@@ -28,15 +28,16 @@ public class Seat implements Comparable<Seat> {
 	 * @param seatNumber
 	 *            The Number of this seat. Number must be greater than 0.
 	 * @param pricePerTicket
-	 *            The Price per ticket. Price must be greater than 0.
+	 *            The Price per ticket. Must not be null and must be greater than 0.
 	 * @throws IllegalArgumentException
-	 *             If the any of the constraints are broken.
+	 *             If the any of the constraints are invalidated.
 	 */
-	public Seat(int levelId, int row, int seatNumber, double pricePerTicket) {
+	public Seat(int levelId, int row, int seatNumber, MonetaryAmount pricePerTicket) {
 		Preconditions.checkArgument(levelId > 0, "Invalid Level ID, Must be greater than 0");
 		Preconditions.checkArgument(row > 0, "Invalid Row, Must be greater than 0");
 		Preconditions.checkArgument(seatNumber > 0, "Invalid Seat Number, Must be greater than 0");
-		Preconditions.checkArgument(pricePerTicket > 0, "Invalid Price, Must be greater than 0");
+		Preconditions.checkArgument(pricePerTicket != null, "Invalid Price, Price must not be null");
+		Preconditions.checkArgument(pricePerTicket.isPositive(), "Invalid Price, Must be greater than 0");
 		this.levelId = levelId;
 		this.row = row;
 		this.seatNumber = seatNumber;
@@ -67,7 +68,7 @@ public class Seat implements Comparable<Seat> {
 	/**
 	 * @return the pricePerTicket
 	 */
-	public double getPricePerTicket() {
+	public MonetaryAmount getPricePerTicket() {
 		return pricePerTicket;
 	}
 

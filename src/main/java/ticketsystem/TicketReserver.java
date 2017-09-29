@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import model.Level;
 import model.Seat;
 import model.SeatHold;
-import model.SeatReservation;
+import model.SeatState;
 import model.Venue;
 
 /**
@@ -37,7 +37,7 @@ public class TicketReserver {
 
 	private final Venue venue;
 
-	private final SortedMap<Seat, SeatReservation> allSeats = new TreeMap<>();
+	private final SortedMap<Seat, SeatState> seatStates = new TreeMap<>();
 
 	private int seatHoldCount = 0;
 
@@ -52,7 +52,7 @@ public class TicketReserver {
 		this.venue = venue;
 		venue.getLevels().forEach((level) -> {
 			level.getSeats().forEach((seat) -> {
-				allSeats.put(seat, new SeatReservation());
+				seatStates.put(seat, new SeatState());
 			});
 		});
 	}
@@ -102,17 +102,15 @@ public class TicketReserver {
 	 *            Optional.empty() will default to max venue level.
 	 * @param customerEmail
 	 *            The customer email to use. Must not be null.
-	 * @return SeatHold object containing the seats that were found. Should never
-	 *         return null (exception will be thrown if it cant find anything).
+	 * @return SeatHold object containing the seats that were found. This will
+	 *         return null if nothing is found.
 	 * 
 	 * @throws IllegalArgumentException
 	 *             If any of the conditions are broken for the arguments.
-	 * @throws RuntimeException
-	 *             If the request can not be found.
 	 */
 	public SeatHold findAndHoldSeats(int numSeats, Optional<Integer> minLevel, Optional<Integer> maxLevel,
 			String customerEmail) {
-		LOG.debug("findAndHoldSeats(), numSeats = {}, customerEmail = {}", numSeats, minLevel);
+		LOG.debug("findAndHoldSeats(), numSeats = {}, customerEmail = {}", numSeats, customerEmail);
 		Preconditions.checkArgument(numSeats > 0, "Invalid numSeats, Number of Seats must be greater than 0");
 		Preconditions.checkArgument(customerEmail != null, "Invalid customerEmail, Email can not be null");
 		Preconditions.checkArgument(!customerEmail.isEmpty(), "Invalid customerEmail, Email can not be empty");
@@ -140,11 +138,9 @@ public class TicketReserver {
 			seatHold = new SeatHold(++seatHoldCount, customerEmail, seats);
 
 			for (Seat seat : seats) {
-				SeatReservation reservation = allSeats.get(seat);
-				reservation.hold(seatHold.getId());
+				SeatState seatState = seatStates.get(seat);
+				seatState.hold(seatHold.getId());
 			}
-		} else {
-			throw new RuntimeException("Request can not be filled, Needed:" + numSeats + ", Found:" + seats.size());
 		}
 
 		return seatHold;
@@ -166,11 +162,11 @@ public class TicketReserver {
 		Preconditions.checkArgument(seatHold != null, "Invalid seatHold, Must not be null");
 
 		for (Seat seat : seatHold.getSeats()) {
-			SeatReservation reservation = allSeats.get(seat);
-			if (reservation != null) {
-				reservation.reserve(seatHold.getId());
+			SeatState seatState = seatStates.get(seat);
+			if (seatState != null) {
+				seatState.reserve(seatHold.getId());
 			} else {
-				throw new IllegalStateException("No Reservation object for Seat");
+				throw new IllegalStateException("Seat does not exist");
 			}
 		}
 
@@ -194,12 +190,12 @@ public class TicketReserver {
 		Preconditions.checkArgument(seatHold != null, "Invalid seatHold, Must not be null");
 
 		for (Seat seat : seatHold.getSeats()) {
-			SeatReservation reservation = allSeats.get(seat);
-			if (reservation != null) {
+			SeatState seatState = seatStates.get(seat);
+			if (seatState != null) {
 
 				// Verify they actually have the reservation on this seat.
-				if (reservation.getSeatHoldId() == seatHold.getId()) {
-					reservation.clear();
+				if (seatState.getSeatHoldId() == seatHold.getId()) {
+					seatState.clear();
 				} else {
 					LOG.debug("expireSeatHold(), attempted to wipe seat that doesnt belong to seathold with id = {}",
 							seatHold.getId());
@@ -207,7 +203,7 @@ public class TicketReserver {
 				}
 
 			} else {
-				throw new IllegalStateException("No Reservation object for Seat");
+				throw new IllegalStateException("Seat does not actually exist");
 			}
 		}
 	}
@@ -262,18 +258,18 @@ public class TicketReserver {
 	}
 
 	private List<Seat> getAllAvailableSeats(Level level) {
-		List<Seat> allAvailableSeats = allSeats.entrySet().stream().filter(filterOutOtherLevels(level))
+		List<Seat> allAvailableSeats = seatStates.entrySet().stream().filter(filterOutOtherLevels(level))
 				.filter(isSeatAvailable()).map(Map.Entry::getKey).collect(Collectors.toList());
 		return allAvailableSeats;
 	}
 
-	private Predicate<Entry<Seat, SeatReservation>> isSeatAvailable() {
+	private Predicate<Entry<Seat, SeatState>> isSeatAvailable() {
 		return (entry) -> {
 			return entry.getValue().isAvailable();
 		};
 	}
 
-	private Predicate<Entry<Seat, SeatReservation>> filterOutOtherLevels(Level level) {
+	private Predicate<Entry<Seat, SeatState>> filterOutOtherLevels(Level level) {
 		return (entry) -> {
 			return level.getSeats().contains(entry.getKey());
 		};

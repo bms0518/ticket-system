@@ -3,13 +3,13 @@ package model;
 import com.google.common.base.Preconditions;
 
 /**
- * Seat Reservation. Represents the State of the Hold/Reservation of a specific
- * Seat. Keeps track of the SeatHold id who has reserved this seat.
+ * SeatState. Represents the State of the Hold/Reservation of a specific Seat.
+ * Keeps track of the SeatHold id who has held/reserved this seat.
  * 
  * @author bstoll
  *
  */
-public class SeatReservation {
+public final class SeatState {
 	private boolean held;
 
 	private boolean reserved;
@@ -20,7 +20,7 @@ public class SeatReservation {
 	 * Sets up a Seat Reservation. held and reserved fields both get set to false.
 	 * SeatHoldId is set to -1.
 	 */
-	public SeatReservation() {
+	public SeatState() {
 		this.reserved = false;
 		this.held = false;
 		this.seatHoldId = -1;
@@ -33,7 +33,9 @@ public class SeatReservation {
 	 * @param seatHoldId
 	 *            The SeatHoldId. Must be greater than 0.
 	 * @throws IllegalArgumentException
-	 *             if seat is already held or invalid id passed in.
+	 *             if invalid id passed in.
+	 * @throws IllegalStateException
+	 *             if seat is already held.
 	 */
 	public void hold(int seatHoldId) {
 		Preconditions.checkArgument(seatHoldId > 0, "Seat Hold ID must be greater than 0");
@@ -50,8 +52,10 @@ public class SeatReservation {
 	 * @param seatHoldId
 	 *            The SeatHoldId. Must be greater than 0.
 	 * @throws IllegalArgumentException
-	 *             if seat is not already held, seat is already reserved, or invalid
-	 *             id passed in.
+	 *             if invalid id passed in or id does not match the one already
+	 *             stored.
+	 * @throws IllegalStateException
+	 *             if seat is not already held or seat is already reserved
 	 */
 	public void reserve(int seatHoldId) {
 		Preconditions.checkArgument(seatHoldId > 0, "Seat Hold ID must be greater than 0");

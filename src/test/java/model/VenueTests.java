@@ -81,7 +81,7 @@ public class VenueTests {
 	@Test(expected = UnsupportedOperationException.class)
 	public void unmodifiableLevels() {
 		Venue venue = new Venue(1, TestObjectFactory.TEST_NAME, TestObjectFactory.TEST_LEVELS);
-		venue.getLevels().add(new Level(1, TestObjectFactory.TEST_NAME, 1, 1, 1));
+		venue.getLevels().add(new Level(1, TestObjectFactory.TEST_NAME, TestObjectFactory.TEST_PRICE, 1, 1));
 
 	}
 
@@ -125,7 +125,7 @@ public class VenueTests {
 	public void nullLevelInLevelsShouldThrowNullPointer() {
 		Level level = null;
 		List<Level> levels = new ArrayList<>();
-		levels.add(new Level(1, TestObjectFactory.TEST_NAME, 1, 1, 1));
+		levels.add(new Level(1, TestObjectFactory.TEST_NAME, TestObjectFactory.TEST_PRICE, 1, 1));
 		levels.add(level);
 
 		new Venue(1, TestObjectFactory.TEST_NAME, levels);
@@ -134,8 +134,8 @@ public class VenueTests {
 	@Test(expected = IllegalArgumentException.class)
 	public void sameIdInLevelsShouldThrowIllegalArgumentException() {
 		List<Level> levels = new ArrayList<>();
-		levels.add(new Level(1, TestObjectFactory.TEST_NAME, 1, 1, 1));
-		levels.add(new Level(1, TestObjectFactory.TEST_NAME, 1, 1, 1));
+		levels.add(new Level(1, TestObjectFactory.TEST_NAME, TestObjectFactory.TEST_PRICE, 1, 1));
+		levels.add(new Level(1, TestObjectFactory.TEST_NAME, TestObjectFactory.TEST_PRICE, 1, 1));
 
 		new Venue(1, TestObjectFactory.TEST_NAME, levels);
 	}

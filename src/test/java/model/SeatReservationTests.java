@@ -10,7 +10,7 @@ public class SeatReservationTests {
 
 	@Test
 	public void testValidConstruction() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		assertFalse(reservation.isHeld());
 		assertFalse(reservation.isReserved());
 		assertEquals(-1, reservation.getSeatHoldId());
@@ -19,7 +19,7 @@ public class SeatReservationTests {
 
 	@Test
 	public void testHold() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(1);
 		assertTrue(reservation.isHeld());
 		assertEquals(1, reservation.getSeatHoldId());
@@ -27,53 +27,53 @@ public class SeatReservationTests {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void zeroIdOnHoldShouldThrowIllegalArgument() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(0);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void negativeIdOnHoldShouldThrowIllegalArgument() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(-1);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void ifAlreadyHeldOnHoldShouldThrowIllegalState() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(1);
 		reservation.hold(1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void zeroIdOnReserveShouldThrowIllegalArgument() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(1);
 		reservation.reserve(0);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void negativeIdOnReserveShouldThrowIllegalArgument() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(1);
 		reservation.reserve(-1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void idDoesntMatchHeldIdOnReserveShouldThrowIllegalArgument() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(1);
 		reservation.reserve(2);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void ifNotAlreadyHeldOnReserveShouldThrowIllegalState() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.reserve(1);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void ifAlreadyReservedOnReserveShouldThrowIllegalState() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(1);
 		reservation.reserve(1);
 		reservation.reserve(1);
@@ -81,7 +81,7 @@ public class SeatReservationTests {
 
 	@Test
 	public void testReserve() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(1);
 		reservation.reserve(1);
 
@@ -92,7 +92,7 @@ public class SeatReservationTests {
 
 	@Test
 	public void testClear() {
-		SeatReservation reservation = new SeatReservation();
+		SeatState reservation = new SeatState();
 		reservation.hold(1);
 		reservation.reserve(1);
 

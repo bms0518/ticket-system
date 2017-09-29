@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.money.MonetaryAmount;
+
 import com.google.common.base.Preconditions;
 
 /**
- * Level represents a section of seats inside of a venue. They are identified by
- * id and name.
+ * Level represents a collection of seats inside of a venue. They are identified
+ * by id and name. This is Immutable.
+ * 
+ * <p>
+ * Currently price is static for the entire level.
  * 
  * 
  * @author bstoll
@@ -27,17 +32,23 @@ public final class Level {
 	 * @param name
 	 *            name of the level. Must not be empty or null.
 	 * @param pricePerTicket
-	 *            The Price of a ticket at this level. Must be greater than 0.
+	 *            The Price of a ticket at this level. Must not be null and must be
+	 *            greater than 0.
 	 * @param numberOfRows
 	 *            The number of rows in this level. Must be greater than 0.
 	 * @param seatsInRow
 	 *            The number of seats in a row. Must be greater than 0.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if any of the constraints are invalidated.
+	 * 
 	 */
-	public Level(int id, String name, double pricePerTicket, int numberOfRows, int seatsInRow) {
+	public Level(int id, String name, MonetaryAmount pricePerTicket, int numberOfRows, int seatsInRow) {
 		Preconditions.checkArgument(id > 0, "Invalid level, Must be greater than 0");
 		Preconditions.checkArgument(numberOfRows > 0, "Invalid Number Of Rows, Must be greater than 0");
 		Preconditions.checkArgument(name != null && !name.isEmpty(), "Invalid Name, Must not be null or empty");
-		Preconditions.checkArgument(pricePerTicket > 0.00, "Invalid Price, Must be greater than 0");
+		Preconditions.checkArgument(pricePerTicket != null, "Invalid Price, Must not be null");
+		Preconditions.checkArgument(pricePerTicket.isPositive(), "Invalid Price, Must be greater than 0");
 		Preconditions.checkArgument(numberOfRows > 0, "Invalid Number Of Rows, Must be greater than 0");
 		Preconditions.checkArgument(seatsInRow > 0, "Invalid Seats in Row, Must be greater than 0");
 

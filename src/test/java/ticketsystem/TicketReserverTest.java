@@ -2,6 +2,7 @@ package ticketsystem;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,11 +120,13 @@ public class TicketReserverTest {
 				TestObjectFactory.TEST_EMAIL);
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void testFindAndHoldAllSeatsPlus1() {
 		TicketReserver reserver = TestObjectFactory.newReserver();
-		reserver.findAndHoldSeats(TestObjectFactory.TOTAL_SEATS_IN_VENUE + 1, Optional.of(1), Optional.of(4),
-				TestObjectFactory.TEST_EMAIL);
+		SeatHold seatHold = reserver.findAndHoldSeats(TestObjectFactory.TOTAL_SEATS_IN_VENUE + 1, Optional.of(1),
+				Optional.of(4), TestObjectFactory.TEST_EMAIL);
+		assertNull(seatHold);
+
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -204,7 +207,7 @@ public class TicketReserverTest {
 		TicketReserver reserver = TestObjectFactory.newReserver();
 
 		// Make a seat that i dont actually have a hold to.
-		Seat seat = new Seat(3, 3, 3, 22.00);
+		Seat seat = new Seat(3, 3, 3, TestObjectFactory.TEST_PRICE);
 
 		List<Seat> seats = new ArrayList<>();
 		seats.add(seat);
@@ -220,7 +223,7 @@ public class TicketReserverTest {
 
 		// Make a seat that doesnt actually exist
 		// Level 6 doesnt exist.
-		Seat seat = new Seat(6, 6, 6, 22.00);
+		Seat seat = new Seat(6, 6, 6, TestObjectFactory.TEST_PRICE);
 
 		List<Seat> seats = new ArrayList<>();
 		seats.add(seat);
@@ -243,7 +246,7 @@ public class TicketReserverTest {
 	public void expireSeatHoldBadSeatHold() {
 		TicketReserver reserver = TestObjectFactory.newReserver();
 		// Make a seat that i dont actually have a hold to.
-		Seat seat = new Seat(3, 3, 3, 22.00);
+		Seat seat = new Seat(3, 3, 3, TestObjectFactory.TEST_PRICE);
 
 		List<Seat> seats = new ArrayList<>();
 		seats.add(seat);
@@ -259,7 +262,7 @@ public class TicketReserverTest {
 
 		// Make a seat that doesnt actually exist
 		// Level 6 doesnt exist.
-		Seat seat = new Seat(6, 6, 6, 22.00);
+		Seat seat = new Seat(6, 6, 6, TestObjectFactory.TEST_PRICE);
 
 		List<Seat> seats = new ArrayList<>();
 		seats.add(seat);

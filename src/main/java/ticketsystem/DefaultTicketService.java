@@ -17,6 +17,7 @@ import model.SeatHold;
 /**
  * Default Ticket Service. Allows holding and reserving tickets.
  * 
+ * 
  * @author bstoll
  *
  */
@@ -32,8 +33,42 @@ public class DefaultTicketService implements TicketService {
 
 	private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+	private final long expirationTime;
+
+	private final TimeUnit expirationUnits;
+
+	/**
+	 * Sets up Default Ticket Service. This will use default expiration time of 2
+	 * minutes.
+	 * 
+	 * @param ticketReserver
+	 *            The TicketReserver. Must not be null.
+	 * @throws IllegalArgumentException
+	 *             if ticketReserver is null.
+	 */
 	public DefaultTicketService(TicketReserver ticketReserver) {
+		this(ticketReserver, 2, TimeUnit.MINUTES);
+	}
+
+	/**
+	 * Sets up Default Ticket Service.
+	 * 
+	 * @param ticketReserver
+	 *            The TicketReserver. Must not be null.
+	 * @param expirationTime
+	 *            The time it takes to expire. This is in combination with TimeUnit.
+	 *            Must be greater than 0.
+	 * @param expirationUnits
+	 *            The TimeUnit for expiration. Must not be null.
+	 * @throws IllegalArgumentException
+	 *             if any of the constraints are invalidated.
+	 */
+	public DefaultTicketService(TicketReserver ticketReserver, long expirationTime, TimeUnit expirationUnits) {
 		Preconditions.checkArgument(ticketReserver != null, "Invalid ticketReserver. Must not be null");
+		Preconditions.checkArgument(expirationTime > 0, "Invalid expirationTime. Must be greater than 0");
+		Preconditions.checkArgument(expirationUnits != null, "Invalid TimeUnit for Expiration. Must not be null");
+		this.expirationTime = expirationTime;
+		this.expirationUnits = expirationUnits;
 		this.ticketReserver = ticketReserver;
 	}
 
@@ -53,12 +88,16 @@ public class DefaultTicketService implements TicketService {
 		synchronized (ticketReserver) {
 
 			SeatHold seatHold = ticketReserver.findAndHoldSeats(numSeats, minLevel, maxLevel, customerEmail);
-			TemporarySeatHold tempSeatHold = new TemporarySeatHold(seatHold);
+			if (seatHold != null) {
+				TemporarySeatHold tempSeatHold = new TemporarySeatHold(seatHold);
 
-			tempSeatHolds.put(seatHold.getId(), tempSeatHold);
-			// Expire this SeatHold in 2 minutes.
-			ScheduledFuture<?> tempSeatHoldFuture = executor.schedule(tempSeatHold, 2, TimeUnit.MINUTES);
-			tempSeatHoldFutures.put(seatHold.getId(), tempSeatHoldFuture);
+				tempSeatHolds.put(seatHold.getId(), tempSeatHold);
+
+				// Expire this SeatHold after set time.
+				ScheduledFuture<?> tempSeatHoldFuture = executor.schedule(tempSeatHold, expirationTime,
+						expirationUnits);
+				tempSeatHoldFutures.put(seatHold.getId(), tempSeatHoldFuture);
+			}
 
 			return seatHold;
 		}
@@ -98,12 +137,19 @@ public class DefaultTicketService implements TicketService {
 		}
 	}
 
+	/**
+	 * A Temporary SeatHold is one that is meant to expire. When this is run the
+	 * SeatHold stored will expire.
+	 * 
+	 * 
+	 * @author bstoll
+	 *
+	 */
 	private class TemporarySeatHold implements Runnable {
 
 		private final SeatHold seatHold;
 
 		private TemporarySeatHold(SeatHold seatHold) {
-			Preconditions.checkArgument(seatHold != null);
 			this.seatHold = seatHold;
 		}
 
