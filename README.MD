@@ -2,10 +2,13 @@
 
 Ticket System is a basic ticket reservation service that allows users to hold,reserve, and view the total number of seats available.
 
+- Ticket System was built using gradle 3.5, JDK 8 update 144
+
 ## Build, Test, Run
 
 Ticket system is built using Gradle. The gradle wrapper is used in this project and is all that is needed to build, test, and run the system. This can be run on Windows and Linux. Download/Clone the project to local machine. Open up a command-window/terminal in the root of the project and run these commands.
 
+- NOTE: JDK 8 Must be installed and on your PATH before running these commands or they will fail.
 
 ### Building the project
 ````
